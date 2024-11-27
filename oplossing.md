@@ -2,5 +2,9 @@ Vul onderstaande aan met de antwoorden op de vragen uit de readme.md file. Wil j
 opmaak met Markdown.
 
 a)
+Om geen sudo te gebruiken, hebben we de volgende commando's uitgevoerd:
+![usermod](Images/dockeruser.png)
+![show group](Images/dockeruser2.png)
 
-b)
+b)Installatie van docker voltooid
+![docker](Images/InstallatieDocker.png)

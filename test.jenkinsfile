@@ -1,16 +1,52 @@
 pipeline {
     agent any
-  
+
+    tools {
+        nodejs 'testenvnode'
+    }
+
     stages {
-        stage ('cleanup'){
-            steps{
-                // TODO
+        stage ('cleanup') {
+            steps {
+                sh 'docker stop my-calculator-test-app'
+                sh 'docker rm my-calculator-test-app'
+                cleanWs()
             }
         }
         stage('fetch app code') {
             steps {
-                // Get some code from a GitHub repository
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'npm i'
+            }
+        }
+        stage('Build artifact') {
+            steps {
+                sh 'docker build . -t devops-dtap-testenv:latest'
+            }
+        }
+        stage('Push artifact') {
+            steps {
+                echo 'Pushing artifact!'
+                withCredentials([usernamePassword(
+                    credentialsId: '75d06990-15b8-49dd-9383-ff1cbd387ce8',
+                    usernameVariable: 'docker_login_user',
+                    passwordVariable: 'docker_login_password'
+                )]) {
+                    sh "docker login -u ${docker_login_user} -p ${docker_login_password}"
+                }
+                sh 'docker tag devops-dtap-testenv jasperpxl/devops-dtap-testenv'
+                sh 'docker push jasperpxl/devops-dtap-testenv'
+                sh 'docker image rm jasperpxl/devops-dtap-testenv'
+                sh 'docker image rm devops-dtap-testenv'
+            }
+        }
+        stage('Deployment') {
+            steps {
+                sh 'docker run -dp 3000:3000 --name my-calculator-test-app docker.io/jasperpxl/devops-dtap-testenv'
             }
         }
     }

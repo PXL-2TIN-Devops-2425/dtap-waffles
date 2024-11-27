@@ -1,9 +1,29 @@
 pipeline {
     agent any
+
+    environment {
+        PROD_SERVER_IP = '52.91.114.247'
+    }
+
     stages {
-        stage('dtap production') {
+        stage('deploy prod') {
             steps {
-                echo "good luck..."
+                sshagent(['devops-dtap-prod-server']) {
+                    sh "ssh -o StrictHostKeyChecking=no -l ubuntu ${PROD_SERVER_IP} docker pull jasperpxl/devops-dtap-testenv:latest"
+                }
+            }
+        }
+        stage('start prod') {
+            steps {
+                sshagent(['devops-dtap-prod-server']) {
+                    sh "ssh -o StrictHostKeyChecking=no -l ubuntu ${PROD_SERVER_IP} docker rm -f my-calculator-app"
+                    sh "ssh -o StrictHostKeyChecking=no -l ubuntu ${PROD_SERVER_IP} docker run --name=my-calculator-app -dp 80:3000 jasperpxl/devops-dtap-testenv:latest"
+                }
+            }
+        }
+        stage('test prod') {
+            steps {
+                sh "curl -I http://${PROD_SERVER_IP}"
             }
         }
     }
