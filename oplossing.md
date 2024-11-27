@@ -6,4 +6,5 @@ Om geen sudo te gebruiken, hebben we de volgende commando's uitgevoerd:
 ![usermod](Images/dockeruser.png)
 ![show group](Images/dockeruser2.png)
 
-b)
+b)Installatie van docker voltooid
+![docker](Images/InstallatieDocker.png)
